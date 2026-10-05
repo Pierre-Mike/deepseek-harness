@@ -1,0 +1,64 @@
+{
+  "pass_rate": 0.8749999999999999,
+  "noise": 0.048749999999999995,
+  "trials": 2,
+  "timestamp": "2026-09-29T21-35-59",
+  "results": [
+    {
+      "id": "note-threshold-accept",
+      "mean_pass_rate": 0.88,
+      "std_dev": 0,
+      "pass_at_k": 0,
+      "pass_hat_k": 0
+    },
+    {
+      "id": "note-threshold-reject-local",
+      "mean_pass_rate": 1,
+      "std_dev": 0,
+      "pass_at_k": 1,
+      "pass_hat_k": 1
+    },
+    {
+      "id": "spec-loop-proposal-only",
+      "mean_pass_rate": 0.88,
+      "std_dev": 0,
+      "pass_at_k": 0,
+      "pass_hat_k": 0
+    },
+    {
+      "id": "note-promotion",
+      "mean_pass_rate": 0.94,
+      "std_dev": 0.06,
+      "pass_at_k": 1,
+      "pass_hat_k": 0
+    },
+    {
+      "id": "setup-repo",
+      "mean_pass_rate": 0.5,
+      "std_dev": 0.32999999999999996,
+      "pass_at_k": 0,
+      "pass_hat_k": 0
+    },
+    {
+      "id": "fix-failed-promotion",
+      "mean_pass_rate": 1,
+      "std_dev": 0,
+      "pass_at_k": 1,
+      "pass_hat_k": 1
+    },
+    {
+      "id": "archive-note",
+      "mean_pass_rate": 1,
+      "std_dev": 0,
+      "pass_at_k": 1,
+      "pass_hat_k": 1
+    },
+    {
+      "id": "notes-audit",
+      "mean_pass_rate": 0.8,
+      "std_dev": 0,
+      "pass_at_k": 0,
+      "pass_hat_k": 0
+    }
+  ]
+}

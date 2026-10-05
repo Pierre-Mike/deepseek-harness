@@ -1,0 +1,33 @@
+{
+  "name": "agent-notes",
+  "description": "Spec-driven development with DeepSeek-Harness-style Agent Notes in .agents/notes/{lifecycle}/{class}/: the ds-spec-loop method (vendored, MIT) for proposing, implementing against evidence, and promoting decisions, plus repo scaffolding, deterministic gates for structure, format, links, and a frozen archive, archiving rules, and a notes-vs-code audit.",
+  "triggers": [
+    ".agents/notes",
+    "RFC",
+    "acceptance criteria",
+    "add a feature",
+    "agent note",
+    "agent notes",
+    "archive note",
+    "audit decisions",
+    "check-notes",
+    "decision record",
+    "design doc",
+    "note gate",
+    "promote proposal",
+    "proposal",
+    "reject proposal",
+    "seal archive",
+    "spec",
+    "spec-driven development"
+  ],
+  "tags": [
+    "agent-notes",
+    "audit",
+    "decision-records",
+    "enforcement",
+    "spec-driven",
+    "spec-loop"
+  ],
+  "version": "1.1.0"
+}

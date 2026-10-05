@@ -1,0 +1,123 @@
+{
+  "skill_name": "agent-notes",
+  "note": "LLM-judged behavioral evals. Each case targets one failure mode; expectations are binary. Dimensions: note threshold (accept, reject local), spec loop (proposal-only, promotion), setup, gate-failure repair, archive/freeze, notes audit. Run: bun scripts/run-eval.ts agent-notes",
+  "evals": [
+    {
+      "id": "note-threshold-accept",
+      "prompt": "We just decided: the Ordering module and the Billing module will communicate only through domain events on our message bus — no direct HTTP calls and no shared database tables between them. We picked this over synchronous REST calls because Billing must keep accepting orders during its nightly reprocessing window, even though events make debugging harder. We know most teams would default to REST here.\n\nThe decision is already implemented in this PR. The repo has .agents/notes/README.md plus .agents/notes/implemented/architecture/2026-05-02-monorepo.md and .agents/notes/implemented/architecture/2026-05-10-postgres.md; neither covers communication between modules. Today is 2026-09-29. Apply the agent-notes skill: should this be recorded, and if so show exactly what you would write.",
+      "expected_output": "Durable rationale the code does not explain, so a note is warranted. The decision shipped in this PR, so it goes straight to .agents/notes/implemented/architecture/2026-09-29-<slug>.md with the exact header block, ## Problem first, a present-tense ## Decision, ## Alternatives considered naming synchronous REST and why it lost, and ## Consequences naming the debugging cost. No proposal-era sections. States that it checked existing notes for an owner.",
+      "files": [],
+      "expectations": [
+        "The output decides this decision SHOULD be recorded as an Agent Note",
+        "The note path is .agents/notes/implemented/architecture/2026-09-29-<kebab-slug>.md",
+        "The note starts with '# Agent Note: <title>', a blank line, then exactly 'Status: implemented'",
+        "The body opens with ## Problem and includes ## Decision, ## Alternatives considered, and ## Consequences",
+        "## Alternatives considered names synchronous REST (or HTTP calls) and why it lost",
+        "## Consequences mentions the accepted cost (harder debugging)",
+        "The note contains no ## Proposal, ## Plan, ## Acceptance criteria, or ## Risks section",
+        "The output mentions checking existing notes for one that already owns this decision"
+      ]
+    },
+    {
+      "id": "note-threshold-reject-local",
+      "prompt": "Two changes in this PR: (1) I moved the 'Export' button on the report page from the bottom toolbar to the top-right corner because it was hard to find, and (2) I renamed a local variable `tmp` to `rows` inside one function. Nothing else changed. Apply the agent-notes skill: do either of these need an Agent Note? Decide and explain.",
+      "expected_output": "Neither qualifies: both are local edits (a local UI presentation tweak and a mechanical local rename) with no lasting rationale. The agent says so briefly and writes no note.",
+      "files": [],
+      "expectations": [
+        "The output decides that NEITHER change needs an Agent Note",
+        "The output gives the reason: both are local or mechanical edits with no lasting decision rationale",
+        "The output does not create or draft any note content or file path",
+        "The output does not use diff size alone as the reason"
+      ]
+    },
+    {
+      "id": "spec-loop-proposal-only",
+      "prompt": "Repo: a TypeScript API with Hono, tests run with `bun test`, lefthook for pre-commit. .agents/notes/ exists with a README and a few implemented notes; none covers exports. Today is 2026-09-29.\n\nI want to add PDF export of compliance reports so reviewers stop copying analyzer output into Word by hand. We have not decided whether to render server-side or use the browser's print dialog. Apply the agent-notes skill: investigate and write the proposal. Do NOT implement it.",
+      "expected_output": "Writes .agents/notes/proposed/feature/2026-09-29-<slug>.md with Status: proposed, a solution-independent ## Problem, ## Proposal, ## Alternatives considered comparing server-side rendering and browser print, ## Acceptance criteria where each criterion names an observable outcome and a falsifying check, and ## Risks including what is given up. Surfaces the undecided rendering choice to the user. Writes no code, routes, or tests.",
+      "files": [],
+      "expectations": [
+        "The note path is .agents/notes/proposed/feature/2026-09-29-<kebab-slug>.md",
+        "The header is '# Agent Note: <title>', blank line, 'Status: proposed'",
+        "## Problem describes the reviewers' manual copying without presupposing a solution",
+        "The note has ## Proposal, ## Alternatives considered, ## Acceptance criteria, and ## Risks",
+        "## Alternatives considered compares server-side rendering with browser print-to-PDF and says why one loses",
+        "Each acceptance criterion is observable and names a concrete check (a bun test, an API call, or a runtime path) that could prove it false",
+        "The output flags the open rendering choice for the user rather than presenting it as decided",
+        "The output does not write implementation code, routes, or test files"
+      ]
+    },
+    {
+      "id": "note-promotion",
+      "prompt": "The PDF export feature is implemented. Checks run: `bun test src/reports` (12 pass), `curl localhost:3000/reports/42/pdf` returned a valid PDF, and `curl localhost:3000/reports/999/pdf` returned 404. The owning note is .agents/notes/proposed/feature/2026-09-20-pdf-export.md:\n\n```md\n# Agent Note: PDF export of compliance reports\n\nStatus: proposed\n\n## Problem\n\nReviewers copy analyzer output into Word by hand to share it.\n\n## Proposal\n\nWe will add GET /reports/:id/pdf, rendered server-side from the existing report model.\n\n## Alternatives considered\n\n**Browser print-to-PDF.** Loses because layout varies by browser.\n\n## Acceptance criteria\n\n- Exporting an existing report returns a PDF whose findings match the JSON report.\n- A missing report returns 404.\n\n## Risks\n\n- Adds a PDF rendering dependency.\n```\n\nApply the agent-notes skill: finish the lifecycle for this note.",
+      "expected_output": "Moves the note with git mv to .agents/notes/implemented/feature/2026-09-20-pdf-export.md (date unchanged), sets Status: implemented, rewrites ## Proposal into a present-tense ## Decision, folds acceptance and risks into ## Consequences and ## Verification listing the checks actually run with results, keeps ## Problem and ## Alternatives considered, leaves no proposal-era headings, and runs check-notes.ts.",
+      "files": [],
+      "expectations": [
+        "The note moves to .agents/notes/implemented/feature/2026-09-20-pdf-export.md, keeping the 2026-09-20 date",
+        "The status line becomes exactly 'Status: implemented'",
+        "## Proposal is rewritten as ## Decision in the present tense",
+        "The promoted note has no ## Proposal, ## Acceptance criteria, or ## Risks headings",
+        "A ## Verification (or ## Consequences) section lists bun test src/reports and both curl checks with their outcomes",
+        "The rendering-dependency risk survives as a consequence",
+        "## Alternatives considered is preserved",
+        "The output runs or instructs running check-notes.ts after the move"
+      ]
+    },
+    {
+      "id": "setup-repo",
+      "prompt": "This TypeScript repo has an AGENTS.md with build instructions, lefthook.yml for pre-commit, and no decision records of any kind (no .agents/notes). I want DeepSeek-style Agent Notes here. Apply the agent-notes skill: set it up.",
+      "expected_output": "Runs init-notes.ts as a dry run, then --write: creates .agents/notes/README.md from the template, copies the gate into the repo as .agents/scripts/check-notes.ts, appends an ## Agent Notes section to the existing AGENTS.md without replacing its content, and adds a lefthook command that runs `bun .agents/scripts/check-notes.ts`. Recommends the same command in CI, runs the gate once, and does not pre-create empty lifecycle or class folders.",
+      "files": [],
+      "expectations": [
+        "The output runs init-notes.ts (a dry run first, then --write), or produces its exact effect",
+        "The output creates .agents/notes/README.md containing the Agent Note rules",
+        "The output copies the gate into the repo at .agents/scripts/check-notes.ts",
+        "The output appends an ## Agent Notes section to the existing AGENTS.md and keeps its build instructions",
+        "The lefthook pre-commit command runs `bun .agents/scripts/check-notes.ts`, not a path into a skill directory such as ~/.claude/skills",
+        "The output adds or recommends running `bun .agents/scripts/check-notes.ts` in CI",
+        "The output runs the gate once (or instructs running it) after setup",
+        "The output does not pre-create empty proposed/implemented/rejected/archived or class folders"
+      ]
+    },
+    {
+      "id": "fix-failed-promotion",
+      "prompt": "The pre-commit hook failed:\n\n```\ncheck-notes: violations found:\n  format: .agents/notes/implemented/feature/2026-09-20-pdf-export.md — `## Acceptance criteria` is a proposal-era heading; rewrite it into present-tense Decision/Consequences/Verification\n  format: .agents/notes/implemented/feature/2026-09-20-pdf-export.md — `## Risks` is a proposal-era heading; rewrite it into present-tense Decision/Consequences/Verification\n  format: .agents/notes/implemented/feature/2026-09-20-pdf-export.md — missing the required `## Decision` section\n  format: .agents/notes/implemented/feature/2026-09-20-pdf-export.md — missing the required `## Consequences` section\n```\n\nThe note was moved from proposed/ and its status changed to implemented. Its body still reads:\n\n```md\n## Problem\n\nReviewers copy analyzer output into Word by hand to share it.\n\n## Proposal\n\nWe will add GET /reports/:id/pdf, rendered server-side from the existing report model.\n\n## Alternatives considered\n\n**Browser print-to-PDF.** Loses because layout varies by browser.\n\n## Acceptance criteria\n\n- Exporting an existing report returns a PDF whose findings match the JSON report.\n- A missing report returns 404.\n\n## Risks\n\n- Adds a PDF rendering dependency.\n```\n\nThe PR ran `bun test src/reports` (12 pass) and curl checks: /reports/42/pdf returned a valid PDF, /reports/999/pdf returned 404. Apply the agent-notes skill: fix it.",
+      "expected_output": "Fixes the note, not the gate: rewrites ## Proposal into a present-tense ## Decision, folds acceptance criteria into a ## Verification section listing the bun test and curl checks with their outcomes, turns the rendering-dependency risk into ## Consequences, keeps ## Problem and ## Alternatives considered, removes the proposal-era headings, and reruns check-notes.ts.",
+      "files": [],
+      "expectations": [
+        "The output fixes the note and does not change, bypass, or disable the check-notes gate or hook",
+        "## Proposal becomes ## Decision in the present tense (e.g. 'The API serves GET /reports/:id/pdf')",
+        "The rewritten note has no ## Proposal, ## Acceptance criteria, or ## Risks headings",
+        "A ## Verification (or ## Consequences) section lists bun test src/reports and both curl checks with their outcomes",
+        "The rendering-dependency risk survives in ## Consequences",
+        "## Problem and ## Alternatives considered are preserved",
+        "The output reruns or instructs rerunning check-notes.ts"
+      ]
+    },
+    {
+      "id": "archive-note",
+      "prompt": "Repo has .agents/notes/ with a sealed archive (archived/manifest.json exists). The note .agents/notes/implemented/process/2026-03-01-npm-to-bun.md records why we moved from npm to bun; the move finished months ago and nothing current depends on its rationale, but the history is worth keeping. AGENTS.md links to it. Today is 2026-09-29. Also, a teammate wants to fix a typo inside the already-archived note archived/testing/2026-02-10-vitest.md. Apply the agent-notes skill.",
+      "expected_output": "Archives the npm-to-bun note: git mv to archived/process/, inserts 'Archived: 2026-09-29' as line 4 below 'Status: implemented' with no other edit, repairs the AGENTS.md link, runs check-notes.ts --seal then check-notes.ts. Declines the typo fix: sealed archived notes are frozen and the gate would reject it.",
+      "files": [],
+      "expectations": [
+        "The output moves the note with git mv to .agents/notes/archived/process/2026-03-01-npm-to-bun.md",
+        "The output inserts 'Archived: 2026-09-29' directly below 'Status: implemented' and makes no other edit to the note",
+        "The output repairs the AGENTS.md link (to the archived path or to current authority)",
+        "The output runs check-notes.ts --seal and then check-notes.ts",
+        "The output declines to edit the archived vitest note because sealed archived notes are frozen"
+      ]
+    },
+    {
+      "id": "notes-audit",
+      "prompt": "Apply the agent-notes skill to audit whether this repo still follows its decisions.\n\n.agents/notes/implemented/architecture/2026-06-11-events-between-contexts.md — ## Decision: \"Ordering and Billing communicate via domain events only, never synchronous HTTP. Events are published by src/ordering/events/publisher.ts.\"\n.agents/notes/proposed/feature/2026-09-01-pdf-export.md — a proposal, not built.\n\nFacts:\n- src/billing/client.ts line 9: `await http.post('http://ordering.internal/api/orders/confirm', ...)`\n- src/ordering/events/publisher.ts does not exist; publishing moved to src/ordering/outbox.ts.\n- check-notes.ts passes.\n\nProduce the audit.",
+      "expected_output": "Rows: (1) decision violation at src/billing/client.ts:9 with both ways out (fix the code or supersede the note); (2) stale fact: the note names src/ordering/events/publisher.ts, now src/ordering/outbox.ts, fixed by updating the note in place. The proposal is not audited against code. check-notes passing is reported. At most three ranked next actions, nothing applied.",
+      "files": [],
+      "expectations": [
+        "The audit reports the HTTP call at src/billing/client.ts:9 as a violation of the events-only decision",
+        "The violation offers both ways out: fix the code, or supersede the note with a new one",
+        "The audit reports the stale path src/ordering/events/publisher.ts (now src/ordering/outbox.ts) and proposes updating the note in place",
+        "The audit does not treat the proposed pdf-export note as a violation because it is not built",
+        "The audit ends with three or fewer ranked next actions and applies no fix"
+      ]
+    }
+  ]
+}
